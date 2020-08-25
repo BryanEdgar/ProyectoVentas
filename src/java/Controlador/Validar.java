@@ -83,10 +83,10 @@ public class Validar extends HttpServlet {
             String user = request.getParameter("txtuser");
             String pass = request.getParameter("txtpass");
             em = edao.validar(user, pass);
-            System.out.println("Ingresa");
+//            System.out.println("Ingresa");
             if (em.getUser() != null) {
                 request.setAttribute("usuario", em);
-                request.getRequestDispatcher("Controlador?accion=Principal").forward(request, response);
+                request.getRequestDispatcher("Controlador?menu=Principal").forward(request, response);
             } else {
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
