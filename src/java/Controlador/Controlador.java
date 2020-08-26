@@ -5,6 +5,8 @@
  */
 package Controlador;
 
+import Modelo.Cliente;
+import Modelo.ClienteDAO;
 import Modelo.Empleado;
 import Modelo.EmpleadoDAO;
 import Modelo.Producto;
@@ -32,14 +34,16 @@ public class Controlador extends HttpServlet {
     Producto pr = new Producto();
     ProductoDAO epr = new ProductoDAO();
 
+    Cliente cl = new Cliente();
+    ClienteDAO cdao = new ClienteDAO();
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String menu = request.getParameter("menu");
         String accion = request.getParameter("accion");
-        
+
         System.out.println("MENU**" + menu);
         System.out.println("ACCION**" + accion);
-        
 
         if (menu.equals("Principal")) {
             request.getRequestDispatcher("Principal.jsp").forward(request, response);
@@ -50,7 +54,7 @@ public class Controlador extends HttpServlet {
                 case "Listar":
                     List lista = epr.Listar(); //cargo la variable con la lista de empleados
                     request.setAttribute("producto", lista); //envio la variable lista
-                    System.out.println("RECURSOS"+lista.size());
+                    System.out.println("RECURSOS" + lista.size());
                     break;
 
                 case "Agregar":
@@ -99,6 +103,55 @@ public class Controlador extends HttpServlet {
             request.getRequestDispatcher("Producto.jsp").forward(request, response);
         }
         if (menu.equals("Clientes")) {
+            switch (accion) {
+                case "Listar":
+                    List lista = cdao.Listar(); //cargo la variable con la lista de empleados
+                    request.setAttribute("cliente", lista); //envio la variable lista
+                    System.out.println("CLIENTE" + lista.size());
+                    break;
+                case "Agregar":
+                    String dni = request.getParameter("txtDni");
+                    String nom = request.getParameter("txtNom");
+                    String dir = request.getParameter("txtDir");
+                    String est = request.getParameter("txtEst");
+
+                    cl.setDni(dni);
+                    cl.setEst(est);
+                    cl.setNom(nom);
+                    cl.setDir(dir); //AQUI AGREGO LOS VALORES A LA VARIABLE EMPLEADO (SDT)
+
+                    cdao.Agregar(cl);
+                    request.getRequestDispatcher("Controlador?menu=Clientes&accion=Listar").forward(request, response); // en esta linea manda a regrescar los datos en la grilla
+                    break;
+                case "Editar":
+                    ide = Integer.parseInt(request.getParameter("id"));
+                    Cliente c = cdao.ListId(ide);
+                    request.setAttribute("clientes", c);
+                    request.getRequestDispatcher("Controlador?menu=Clientes&accion=Listar").forward(request, response);
+                    break;
+                case "Actualizar":
+                    String dni1 = request.getParameter("txtDni");
+                    String nom1 = request.getParameter("txtNom");
+                    String dir1 = request.getParameter("txtDir");
+                    String est1 = request.getParameter("txtEst");
+
+                    cl.setDni(dni1);
+                    cl.setEst(est1);
+                    cl.setNom(nom1);
+                    cl.setDir(dir1); //AQUI AGREGO LOS VALORES A LA VARIABLE EMPLEADO (SDT)
+                    em.setId(ide);
+                    cdao.Actualizar(cl);
+                    request.getRequestDispatcher("Controlador?menu=Clientes&accion=Listar").forward(request, response);
+                    break;
+                case "delete":
+                    ide = Integer.parseInt(request.getParameter("id"));
+                    cdao.delete(ide);
+                    request.getRequestDispatcher("Controlador?menu=Clientes&accion=Listar").forward(request, response);
+                    break;
+                default:
+                    throw new AssertionError();
+
+            }
             request.getRequestDispatcher("Clientes.jsp").forward(request, response);
         }
         if (menu.equals("RegVenta")) {
