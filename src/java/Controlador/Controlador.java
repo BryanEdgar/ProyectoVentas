@@ -7,6 +7,8 @@ package Controlador;
 
 import Modelo.Empleado;
 import Modelo.EmpleadoDAO;
+import Modelo.Producto;
+import Modelo.ProductoDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -27,17 +29,73 @@ public class Controlador extends HttpServlet {
     Empleado em = new Empleado();
     EmpleadoDAO edao = new EmpleadoDAO();
     int ide;
+    Producto pr = new Producto();
+    ProductoDAO epr = new ProductoDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String menu = request.getParameter("menu");
         String accion = request.getParameter("accion");
+        
+        System.out.println("MENU**" + menu);
+        System.out.println("ACCION**" + accion);
+        
 
         if (menu.equals("Principal")) {
             request.getRequestDispatcher("Principal.jsp").forward(request, response);
         }
 
         if (menu.equals("Producto")) {
+            switch (accion) {
+                case "Listar":
+                    List lista = epr.Listar(); //cargo la variable con la lista de empleados
+                    request.setAttribute("producto", lista); //envio la variable lista
+                    System.out.println("RECURSOS"+lista.size());
+                    break;
+
+                case "Agregar":
+                    String desPro = request.getParameter("txtDes");
+                    double precio = Double.parseDouble(request.getParameter("txtPre"));
+                    double stock = Double.parseDouble(request.getParameter("txtStock"));
+                    String est = request.getParameter("txtEst");
+
+                    pr.setDesPro(desPro);
+                    pr.setPrePro(precio);
+                    pr.setStockPro(stock);
+                    pr.setEstPro(est); //AQUI AGREGO LOS VALORES A LA VARIABLE PRODUCTO (SDT)
+
+                    epr.Agregar(pr);
+                    request.getRequestDispatcher("Controlador?menu=Producto&accion=Listar").forward(request, response); // en esta linea manda a regrescar los datos en la grilla
+                    break;
+                case "Editar":
+                    ide = Integer.parseInt(request.getParameter("id"));
+                    Producto p = epr.ListaId(ide);
+                    request.setAttribute("productos", p);
+                    request.getRequestDispatcher("Controlador?menu=Producto&accion=Listar").forward(request, response);
+                    break;
+                case "Actualizar":
+                    String des1 = request.getParameter("txtDes");
+                    double pre1 = Double.parseDouble(request.getParameter("txtPre"));
+                    double stock1 = Double.parseDouble(request.getParameter("txtStock"));
+                    String est1 = request.getParameter("txtEst");
+
+                    pr.setDesPro(des1);
+                    pr.setPrePro(pre1);
+                    pr.setStockPro(stock1);
+                    pr.setEstPro(est1); //AQUI AGREGO LOS VALORES A LA VARIABLE EMPLEADO (SDT)
+                    pr.setId(ide);
+                    epr.Actualizar(pr);
+                    request.getRequestDispatcher("Controlador?menu=Producto&accion=Listar").forward(request, response);
+                    break;
+                case "delete":
+                    ide = Integer.parseInt(request.getParameter("id"));
+                    epr.delete(ide);
+                    request.getRequestDispatcher("Controlador?menu=Producto&accion=Listar").forward(request, response);
+                    break;
+                default:
+                    throw new AssertionError();
+
+            }
             request.getRequestDispatcher("Producto.jsp").forward(request, response);
         }
         if (menu.equals("Clientes")) {
@@ -46,10 +104,9 @@ public class Controlador extends HttpServlet {
         if (menu.equals("RegVenta")) {
             request.getRequestDispatcher("RegistrarVenta.jsp").forward(request, response);
         }
-        System.out.println("MENU**" + menu);
+
         if (menu.equals("Empleado")) {
             try {
-                System.out.println("ACCION**" + accion);
                 switch (accion) {
                     case "Listar":
                         List lista = edao.Listar(); //cargo la variable con la lista de empleados
@@ -75,7 +132,6 @@ public class Controlador extends HttpServlet {
                     case "Editar":
                         ide = Integer.parseInt(request.getParameter("id"));
                         Empleado e = edao.ListId(ide);
-                        System.out.println("empleado" + e.getNom());
                         request.setAttribute("empleado", e);
                         request.getRequestDispatcher("Controlador?menu=Empleado&accion=Listar").forward(request, response);
                         break;
@@ -85,7 +141,7 @@ public class Controlador extends HttpServlet {
                         String tel1 = request.getParameter("txtTelefono");
                         String est1 = request.getParameter("txtEstado");
                         String usu1 = request.getParameter("txtUsuario");
-                        
+
                         em.setDni(dni1);
                         em.setEstado(est1);
                         em.setNom(nom1);
@@ -96,9 +152,9 @@ public class Controlador extends HttpServlet {
                         request.getRequestDispatcher("Controlador?menu=Empleado&accion=Listar").forward(request, response);
                         break;
                     case "delete":
-                            ide = Integer.parseInt(request.getParameter("id"));
-                            edao.delete(ide);
-                             request.getRequestDispatcher("Controlador?menu=Empleado&accion=Listar").forward(request, response);
+                        ide = Integer.parseInt(request.getParameter("id"));
+                        edao.delete(ide);
+                        request.getRequestDispatcher("Controlador?menu=Empleado&accion=Listar").forward(request, response);
                         break;
                     default:
                         throw new AssertionError();

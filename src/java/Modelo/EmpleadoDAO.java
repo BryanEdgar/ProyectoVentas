@@ -101,9 +101,7 @@ public class EmpleadoDAO {
             ps.setString(5, em.getUser());
             ps.executeUpdate();
         } catch (Exception e) {
-            System.out.println("error"+e);
         }
-        System.out.println("retorna"+r);
         return r;
     }
 
