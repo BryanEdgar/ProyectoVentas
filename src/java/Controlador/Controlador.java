@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileItemFactory;
 
 /**
  *
@@ -62,7 +63,7 @@ public class Controlador extends HttpServlet {
                     double precio = Double.parseDouble(request.getParameter("txtPre"));
                     double stock = Double.parseDouble(request.getParameter("txtStock"));
                     String est = request.getParameter("txtEst");
-
+//                       FileItemFactory
                     pr.setDesPro(desPro);
                     pr.setPrePro(precio);
                     pr.setStockPro(stock);
